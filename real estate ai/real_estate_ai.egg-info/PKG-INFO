@@ -1,0 +1,78 @@
+Metadata-Version: 2.4
+Name: real-estate-ai
+Version: 0.1.0
+Summary: AI-powered real estate property discovery and lead generation
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.115.0
+Requires-Dist: uvicorn[standard]>=0.32.0
+Requires-Dist: sqlalchemy>=2.0.36
+Requires-Dist: psycopg[binary]>=3.2.3
+Requires-Dist: pydantic>=2.10.0
+Requires-Dist: pydantic-settings>=2.6.0
+Requires-Dist: alembic>=1.14.0
+Requires-Dist: python-dotenv>=1.0.1
+Requires-Dist: google-genai>=1.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.3.0; extra == "dev"
+Requires-Dist: httpx2>=0.28.0; extra == "dev"
+
+# Real Estate AI
+
+AI-powered property discovery and lead generation. PostgreSQL is the source of truth for all factual property data.
+
+## Prerequisites
+
+- Python 3.11+
+- PostgreSQL 14+
+
+## Setup
+
+```powershell
+cd "c:\Users\MAINAK NANDI\OneDrive\Desktop\real estate ai"
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+copy .env.example .env
+```
+
+Edit `.env` and set `DATABASE_URL`, for example:
+
+`postgresql+psycopg://postgres:YOUR_PASSWORD@localhost:5432/real_estate_ai`
+
+Create the database in PostgreSQL, then run migrations:
+
+```powershell
+alembic upgrade head
+```
+
+## Run API (health checks only for early phases)
+
+```powershell
+uvicorn app.main:app --reload
+```
+
+- `GET /health` — process liveness  
+- `GET /health/db` — PostgreSQL connectivity  
+
+## Tests
+
+Uses `TEST_DATABASE_URL` if set, otherwise `DATABASE_URL`. The test suite runs Alembic migrations and uses transactional fixtures.
+
+```powershell
+pytest
+```
+
+## Architecture
+
+- `app/models` — SQLAlchemy ORM  
+- `app/repositories` — database access only  
+- `app/services/search` — deterministic search, matching, ranking  
+- `app/ai` — LLM integration (later phases)  
+- `app/api` — FastAPI routes (Phase 13)  
+
+Property data is maintained manually; this repository does not ship sample listings.
+
+## Specification
+
+See `real estate ai flowchart.md` for the master development flow.
